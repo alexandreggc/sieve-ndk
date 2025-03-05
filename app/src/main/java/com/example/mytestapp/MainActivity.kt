@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.buttonExec.setOnClickListener {
-            val iterations = 10
+            val iterations = 5
             val warmupIterations = 5
 
             // default
@@ -199,7 +199,7 @@ class MainActivity : AppCompatActivity() {
             val time11 = measureTime {
                 primesCount = sieveParallelKotlin(primeN)
             }
-            println("Found $primesCount primes")
+            println("Kotlin: Found $primesCount primes")
             timesParallelKotlin += time11.inWholeMilliseconds
         }
         repeat(iterations) {
@@ -207,7 +207,7 @@ class MainActivity : AppCompatActivity() {
             val time4 = measureTime {
                 primesCount  = sieveParallelCpp(primeN)
             }
-            println("Found $primesCount primes")
+            println("C++: Found $primesCount primes")
             timesParallelCpp += time4.inWholeMilliseconds
         }
         repeat(iterations) {
@@ -215,7 +215,7 @@ class MainActivity : AppCompatActivity() {
             val time5 = measureTime {
                 primesCount = sieveParallelC(primeN)
             }
-            println("Found $primesCount primes")
+            println("C: Found $primesCount primes")
             timesParallelC += time5.inWholeMilliseconds
         }
 

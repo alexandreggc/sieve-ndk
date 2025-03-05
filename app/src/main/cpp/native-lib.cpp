@@ -95,13 +95,16 @@ Java_com_example_mytestapp_MainActivity_sieveParallelCpp(
     if (n >= 1) isPrime[1] = false;
 
     int limit = static_cast<int>(std::sqrt(n));
+    std::mutex mtx;
 
     #pragma omp parallel for
     for (int i = 2; i <= limit; ++i) {
         if (isPrime[i]) {
+            mtx.lock();
             for (int j = i * i; j <= n; j += i) {
                 isPrime[j] = false;
             }
+            mtx.unlock();
         }
     }
 
