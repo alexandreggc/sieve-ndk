@@ -9,6 +9,10 @@
 
 #include <unistd.h>
 #include <omp.h>
+#include <android/log.h>
+
+#define LOG_TAG "NativeSieve"
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO,  LOG_TAG, __VA_ARGS__)
 
 
 // C++ implementations: default, results, parallel, results + parallel
@@ -95,6 +99,10 @@ Java_com_example_mytestapp_MainActivity_sieveParallelCpp(
     if (n >= 1) isPrime[1] = false;
 
     int limit = static_cast<int>(std::sqrt(n));
+
+    /*LOGI("Num Procs: %d", omp_get_num_procs());
+    LOGI("Num Threads: %d", omp_get_num_threads());*/
+
     std::mutex mtx;
 
     #pragma omp parallel for
@@ -277,6 +285,7 @@ Java_com_example_mytestapp_MainActivity_sieveParallelC(
     }
 
     int primeCount = 0;
+    #pragma omp parallel for reduction(+:primeCount)
     for (int i = 2; i <= n; i++) {
         if (isPrime[i]) {
             primeCount++;
