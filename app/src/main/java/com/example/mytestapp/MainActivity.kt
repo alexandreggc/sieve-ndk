@@ -148,9 +148,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         // results
-        /*sieveResultsKotlin(primeN)
-            sieveResultsCpp(primeN)
-            sieveResultsC(primeN)*/
 
         // parallel
         repeat(warmupIterations) {
@@ -172,9 +169,6 @@ class MainActivity : AppCompatActivity() {
             println("C: Found $primesCount primes in ${timeC2.inWholeMilliseconds} ms")
         }
         // results + parallel
-        /*sieveResultsParallelCpp(primeN)
-            sieveResultsParallelC(primeN)*/
-
 
         // default tests: kotlin, cpp, c
         println("\n\nTesting (default) ...")
@@ -201,32 +195,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         // results tests: kotlin, cpp, c
-        /*println("Testing (results) ...")
-        repeat(iterations) {
-            System.gc()
-            val time6 = measureTime {
-                primes = sieveResultsKotlin(primeN)
-            }
-            println("Found ${primes.count()} primes")
-            timesResultsKotlin += time6.inWholeMilliseconds
-        }
-        repeat(iterations) {
-            System.gc()
-            val time7 = measureTime {
-                primes = sieveResultsCpp(primeN)
-            }
-            println("Found ${primes.count()} primes")
-            timesResultsCpp += time7.inWholeMilliseconds
-        }
-        repeat(iterations) {
-            System.gc()
-            val time8 = measureTime {
-                primes = sieveResultsC(primeN)
-            }
-            println("Found ${primes.count()} primes")
-            timesResultsC += time8.inWholeMilliseconds
-        }
-        */
 
         // parallel tests: kotlin, cpp, c
         println("\n\nTesting (parallel) ...")
@@ -255,23 +223,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // results + parallel: cpp, c
-        /*println("Testing (results + parallel) ...")
-        repeat(iterations) {
-            System.gc()
-            val time9 = measureTime {
-                primes = sieveResultsParallelCpp(primeN)
-            }
-            println("Found ${primes.count()} primes")
-            timesResultsParallelCpp += time9.inWholeMilliseconds
-        }
-        repeat(iterations) {
-            System.gc()
-            val time10 = measureTime {
-                primes = sieveResultsParallelC(primeN)
-            }
-            println("Found ${primes.count()} primes")
-            timesResultsParallelC += time10.inWholeMilliseconds
-        }*/
+
     }
 
 
