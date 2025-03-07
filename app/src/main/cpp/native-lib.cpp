@@ -105,7 +105,7 @@ Java_com_example_mytestapp_MainActivity_sieveParallelCpp(
 
     std::mutex mtx;
 
-    #pragma omp parallel for
+    #pragma omp parallel for schedule(dynamic)
     for (int i = 2; i <= limit; ++i) {
         if (isPrime[i]) {
             mtx.lock();
@@ -132,7 +132,7 @@ Java_com_example_mytestapp_MainActivity_sieveResultsParallelCpp(
 
     int limit = static_cast<int>(std::sqrt(n));
 
-#pragma omp parallel for
+#pragma omp parallel for schedule(dynamic)
     for (int i = 2; i <= limit; ++i) {
         if (isPrime[i]) {
             for (int j = i * i; j <= n; j += i) {
@@ -275,7 +275,7 @@ Java_com_example_mytestapp_MainActivity_sieveParallelC(
 
     int limit = (int)sqrt((double)n);
 
-    #pragma omp parallel for
+    #pragma omp parallel for schedule(dynamic)
     for (int i = 2; i <= limit; i++) {
         if (isPrime[i]) {
             for (int j = i * i; j <= n; j += i) {
@@ -315,7 +315,7 @@ Java_com_example_mytestapp_MainActivity_sieveResultsParallelC(
 
     int limit = (int)sqrt((double)n);
 
-    #pragma omp parallel for
+    #pragma omp parallel for schedule(dynamic)
     for (int i = 2; i <= limit; i++) {
         if (isPrime[i]) {
             for (int j = i * i; j <= n; j += i) {
