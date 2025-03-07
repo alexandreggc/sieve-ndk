@@ -2,9 +2,11 @@ package com.example.mytestapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.lifecycle.lifecycleScope
 import com.example.mytestapp.databinding.ActivityMainBinding
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlin.math.sqrt
 import kotlin.time.measureTime
 
@@ -41,85 +43,91 @@ class MainActivity : AppCompatActivity() {
             val timesResultsParallelCpp = mutableListOf<Long>()
             val timesResultsParallelC = mutableListOf<Long>()
 
-            startSievePerformanceTests(warmupIterations, iterations,
-                timesKotlin, timesCpp, timesC,
-                timesResultsKotlin, timesResultsCpp, timesResultsC,
-                timesParallelKotlin, timesParallelCpp, timesParallelC,
-                timesResultsParallelCpp, timesResultsParallelC)
+            lifecycleScope.launch {
+                withContext(Dispatchers.Default) {
+                    startSievePerformanceTests(warmupIterations, iterations,
+                        timesKotlin, timesCpp, timesC,
+                        timesResultsKotlin, timesResultsCpp, timesResultsC,
+                        timesParallelKotlin, timesParallelCpp, timesParallelC,
+                        timesResultsParallelCpp, timesResultsParallelC)
+                }
 
-            val avgDefaultKotlin = timesKotlin.average()
-            val avgDefaultCpp = timesCpp.average()
-            val avgDefaultC = timesC.average()
+                val avgDefaultKotlin = timesKotlin.average()
+                val avgDefaultCpp = timesCpp.average()
+                val avgDefaultC = timesC.average()
 
-            val avgResultsKotlin = timesResultsKotlin.average()
-            val avgResultsCpp = timesResultsCpp.average()
-            val avgResultsC = timesResultsC.average()
+                val avgResultsKotlin = timesResultsKotlin.average()
+                val avgResultsCpp = timesResultsCpp.average()
+                val avgResultsC = timesResultsC.average()
 
-            val averageParallelKotlin = timesParallelKotlin.average()
-            val averageParallelCpp = timesParallelCpp.average()
-            val averageParallelC = timesParallelC.average()
+                val averageParallelKotlin = timesParallelKotlin.average()
+                val averageParallelCpp = timesParallelCpp.average()
+                val averageParallelC = timesParallelC.average()
 
-            val avgResultsParallelCpp = timesResultsParallelCpp.average()
-            val avgResultsParallelC = timesResultsParallelC.average()
+                val avgResultsParallelCpp = timesResultsParallelCpp.average()
+                val avgResultsParallelC = timesResultsParallelC.average()
 
-            println("\n\n\n")
-            println("(default) kotlin avg time (ms): $avgDefaultKotlin")
-            println("(default) C++ avg time (ms): $avgDefaultCpp")
-            println("(default) C avg time (ms): $avgDefaultC")
+                println("\n\n\n")
+                println("(default) kotlin avg time (ms): $avgDefaultKotlin")
+                println("(default) C++ avg time (ms): $avgDefaultCpp")
+                println("(default) C avg time (ms): $avgDefaultC")
 
-            println("(results) kotlin avg time (ms): $avgResultsKotlin")
-            println("(results) C++ avg time (ms): $avgResultsCpp")
-            println("(results) C avg time (ms): $avgResultsC")
+                println("(results) kotlin avg time (ms): $avgResultsKotlin")
+                println("(results) C++ avg time (ms): $avgResultsCpp")
+                println("(results) C avg time (ms): $avgResultsC")
 
-            println("(parallel) kotlin avg time (ms): $averageParallelKotlin")
-            println("(parallel) C++ avg time (ms): $averageParallelCpp")
-            println("(parallel) C avg time (ms): $averageParallelC")
+                println("(parallel) kotlin avg time (ms): $averageParallelKotlin")
+                println("(parallel) C++ avg time (ms): $averageParallelCpp")
+                println("(parallel) C avg time (ms): $averageParallelC")
 
-            println("(results + parallel) C++ avg time (ms): $avgResultsParallelCpp")
-            println("(results + parallel) C avg time (ms): $avgResultsParallelC")
+                println("(results + parallel) C++ avg time (ms): $avgResultsParallelCpp")
+                println("(results + parallel) C avg time (ms): $avgResultsParallelC")
 
-            // default
-            binding.defaultKotlinTime.text = "$avgDefaultKotlin"
-            binding.defaultCppTime.text = "$avgDefaultCpp"
-            binding.defaultCTime.text = "$avgDefaultC"
+                withContext(Dispatchers.Main){
+                    // default
+                    binding.defaultKotlinTime.text = "$avgDefaultKotlin"
+                    binding.defaultCppTime.text = "$avgDefaultCpp"
+                    binding.defaultCTime.text = "$avgDefaultC"
 
-            // results
-            binding.resultsKotlinTime.text = "$avgResultsKotlin"
-            binding.resultsCppTime.text = "$avgResultsCpp"
-            binding.resultsCTime.text = "$avgResultsC"
+                    // results
+                    binding.resultsKotlinTime.text = "$avgResultsKotlin"
+                    binding.resultsCppTime.text = "$avgResultsCpp"
+                    binding.resultsCTime.text = "$avgResultsC"
 
-            //parallel
-            binding.parallelKotlinTime.text = "$averageParallelKotlin"
-            binding.parallelCppTime.text = "$averageParallelCpp"
-            binding.parallelCTime.text = "$averageParallelC"
+                    //parallel
+                    binding.parallelKotlinTime.text = "$averageParallelKotlin"
+                    binding.parallelCppTime.text = "$averageParallelCpp"
+                    binding.parallelCTime.text = "$averageParallelC"
 
-            // results + parallel
-            binding.resultsParallelCppTime.text = "$avgResultsParallelCpp"
-            binding.resultsParallelCTime.text = "$avgResultsParallelC"
+                    // results + parallel
+                    binding.resultsParallelCppTime.text = "$avgResultsParallelCpp"
+                    binding.resultsParallelCTime.text = "$avgResultsParallelC"
+                }
+            }
         }
     }
 
 
-    private fun startSievePerformanceTests(warmupIterations:Int, iterations:Int,
-                                           timesKotlin:MutableList<Long>,
-                                           timesCpp:MutableList<Long>,
-                                           timesC:MutableList<Long>,
-                                           timesResultsKotlin:MutableList<Long>,
-                                           timesResultsCpp: MutableList<Long>,
-                                           timesResultsC: MutableList<Long>,
-                                           timesParallelKotlin: MutableList<Long>,
-                                           timesParallelCpp:MutableList<Long>,
-                                           timesParallelC:MutableList<Long>,
-                                           timesResultsParallelCpp:MutableList<Long>,
-                                           timesResultsParallelC:MutableList<Long>) {
+    private suspend fun startSievePerformanceTests(warmupIterations:Int, iterations:Int,
+                                                   timesKotlin:MutableList<Long>,
+                                                   timesCpp:MutableList<Long>,
+                                                   timesC:MutableList<Long>,
+                                                   timesResultsKotlin:MutableList<Long>,
+                                                   timesResultsCpp: MutableList<Long>,
+                                                   timesResultsC: MutableList<Long>,
+                                                   timesParallelKotlin: MutableList<Long>,
+                                                   timesParallelCpp:MutableList<Long>,
+                                                   timesParallelC:MutableList<Long>,
+                                                   timesResultsParallelCpp:MutableList<Long>,
+                                                   timesResultsParallelC:MutableList<Long>) {
 
         val primeN = binding.nPrimes.text.toString().toInt()
         var primes: ArrayList<Int>
         var primesCount: Int
 
         println("\n\nWarmup ...")
+        // default
         repeat(warmupIterations) {
-            // default
             val timeKotlin = measureTime {
                 primesCount = sieveKotlin(primeN)
             }
@@ -132,23 +140,19 @@ class MainActivity : AppCompatActivity() {
             }
             println("C++: Found $primesCount primes in ${timeCpp.inWholeMilliseconds} ms")
         }
-
         repeat(warmupIterations) {
             val timeC = measureTime {
                 primesCount = sieveC(primeN)
             }
             println("C: Found $primesCount primes in ${timeC.inWholeMilliseconds} ms")
         }
-            // results
-            /*sieveResultsKotlin(primeN)
+
+        // results
+        /*sieveResultsKotlin(primeN)
             sieveResultsCpp(primeN)
             sieveResultsC(primeN)*/
 
-            // parallel
-            /*sieveParallelKotlin(primeN)
-            sieveParallelCpp(primeN)
-            sieveParallelC(primeN)*/
-
+        // parallel
         repeat(warmupIterations) {
             val timeKotlin2 = measureTime {
                 primesCount = sieveParallelKotlin(primeN)
@@ -167,8 +171,8 @@ class MainActivity : AppCompatActivity() {
             }
             println("C: Found $primesCount primes in ${timeC2.inWholeMilliseconds} ms")
         }
-            // results + parallel
-            /*sieveResultsParallelCpp(primeN)
+        // results + parallel
+        /*sieveResultsParallelCpp(primeN)
             sieveResultsParallelC(primeN)*/
 
 
@@ -236,7 +240,7 @@ class MainActivity : AppCompatActivity() {
 
         repeat(iterations) {
             val time4 = measureTime {
-                primesCount  = sieveParallelCpp(primeN)
+                primesCount = sieveParallelCpp(primeN)
             }
             println("Cpp: Found $primesCount primes in ${time4.inWholeMilliseconds} ms")
             timesParallelCpp += time4.inWholeMilliseconds
@@ -287,7 +291,7 @@ class MainActivity : AppCompatActivity() {
 
     private external fun sieveResultsParallelC(n: Int): ArrayList<Int>
 
-    private fun sieveKotlin(n: Int): Int {
+    private suspend fun sieveKotlin(n: Int): Int = withContext(Dispatchers.Default) {
         val isPrime = BooleanArray(n + 1) { true }
 
         if (n >= 0) isPrime[0] = false
@@ -305,10 +309,10 @@ class MainActivity : AppCompatActivity() {
 
         val primesCount = isPrime.count { it }
 
-        return primesCount
+        return@withContext primesCount
     }
 
-    private fun sieveResultsKotlin(n: Int): ArrayList<Int> {
+    private suspend fun sieveResultsKotlin(n: Int): ArrayList<Int> = withContext(Dispatchers.Default) {
         val isPrime = BooleanArray(n + 1) { true }
 
         if (n >= 0) isPrime[0] = false
@@ -331,22 +335,29 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        return primes
+        return@withContext primes
     }
 
-    private fun sieveParallelKotlin(n: Int): Int = runBlocking{
+    private suspend fun sieveParallelKotlin(n: Int): Int = withContext(Dispatchers.Default) {
         val isPrime = BooleanArray(n + 1) { true }
 
         if (n >= 0) isPrime[0] = false
         if (n >= 1) isPrime[1] = false
 
         val limit = sqrt(n.toDouble()).toInt()
+        val numThreads = Runtime.getRuntime().availableProcessors()
+        val chunkSize = (limit - 2 + 1) / numThreads
 
-        val jobs = (2..limit).map { i ->
-            launch {
-                if (isPrime[i]) {
-                    for (j in i * i..n step i) {
-                        isPrime[j] = false
+        val jobs = (0 until numThreads).map { threadIndex ->
+            val start = 2 + threadIndex * chunkSize
+            val end = if (threadIndex == numThreads - 1) limit else start + chunkSize - 1
+
+            launch(Dispatchers.Default) {
+                for (i in start..end) {
+                    if (isPrime[i]) {
+                        for (j in i * i..n step i) {
+                            isPrime[j] = false
+                        }
                     }
                 }
             }
@@ -356,7 +367,7 @@ class MainActivity : AppCompatActivity() {
 
         val primesCount = isPrime.count { it }
 
-        return@runBlocking primesCount
+        return@withContext primesCount
     }
 
     companion object {
