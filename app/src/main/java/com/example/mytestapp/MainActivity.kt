@@ -2,17 +2,130 @@ package com.example.mytestapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Environment
+import android.util.Log
 import androidx.lifecycle.lifecycleScope
 import com.example.mytestapp.databinding.ActivityMainBinding
+import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.math.sqrt
+import java.lang.Math.pow
+import java.util.Locale
+import kotlin.reflect.KFunction
+import kotlin.reflect.full.callSuspend
 import kotlin.time.measureTime
+import java.io.File
+
+data class SieveAlgorithm(
+    val language: String,
+    val type: String,
+    val function: KFunction<Int>
+)
+
+data class ResultRow(
+    val language: String,
+    val type: String,
+    val n: Int,
+    val timeMs: Long,
+    val primeCount: Int,
+    val correct: Boolean
+)
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+
+    private val iterations = 5
+    private val warmupIterations = 5
+
+    private val listN : MutableList<Int> = mutableListOf(
+        pow(2.0, 21.0).toInt(), // 2_097_152
+//        pow(2.0, 22.0).toInt(), // 4_194_304
+//        pow(2.0, 23.0).toInt(), // 8_388_608
+//        pow(2.0, 24.0).toInt(), // 16_777_216
+//        pow(2.0, 25.0).toInt(), // 33_554_432
+//        pow(2.0, 26.0).toInt(), // 67_108_864
+//        pow(2.0, 27.0).toInt(), // 134_217_728
+    )
+
+    private val algorithms : MutableList<SieveAlgorithm> = mutableListOf(
+        SieveAlgorithm("Kotlin", "Default", ::sieveKotlin),
+        SieveAlgorithm("Cpp", "Default", ::sieveCpp),
+        SieveAlgorithm("C", "Default", ::sieveC),
+        SieveAlgorithm("Kotlin", "Parallel", ::sieveParallelKotlin),
+        SieveAlgorithm("Cpp", "Parallel", ::sieveParallelCpp),
+        SieveAlgorithm("C", "Parallel", ::sieveParallelC),
+    )
+
+    private val resultsCSV = mutableListOf<ResultRow>()
+
+    private suspend fun runWarmup() {
+        println("\n\nWarmup ...")
+        val algoNPair = listN.flatMap { n -> algorithms.map { n to it } }
+        println(String.format(Locale.getDefault(), "%-50s | %10s", "Algorithm", "N primes"))
+        for ((n, algorithm) in algoNPair) {
+            println(String.format(Locale.getDefault(), "%-50s | %10d ", algorithm, n))
+            repeat(warmupIterations) {
+                algorithm.function.callSuspend(n)
+            }
+        }
+    }
+
+    private suspend fun runTests() {
+        println("\n\nTesting ...")
+        for (n in listN) {
+            val execTimes = mutableListOf<Long>()
+            val primeCount1 = sieveParallelC(n)
+
+            for (algorithm in algorithms) {
+                println("\n\nTest: ${algorithm.function.name} \tN: $n ")
+                println(String.format(Locale.getDefault(), "%-10s | %10s", "Time", "Prime Count"))
+
+                // Run the algorithm multiple times and check if the prime count is correct
+                val correct = BooleanArray(iterations) { false }
+                execTimes.clear()
+                repeat(iterations) {
+                    var primesCount = 0
+                    val time = measureTime {
+                        primesCount = algorithm.function.callSuspend(n)
+                    }.inWholeMilliseconds
+                    if (primesCount != primeCount1)
+                        Log.e("PRIME COUNT", "Incorrect prime count: $primesCount")
+                    else
+                        correct[it] = true
+                    execTimes.add(time)
+                    println(String.format(Locale.getDefault(), "%-10d | %10d | %10s", time, primesCount, correct[it]))
+                }
+
+                // Calculate average execution time and add to results
+                val avgExecTime = execTimes.average().toLong()
+                println("Average time: $avgExecTime")
+                resultsCSV.add(ResultRow(algorithm.language, algorithm.type, n, avgExecTime, primeCount1, correct.all { it }))
+            }
+        }
+
+        writeResultsToCSV()
+    }
+
+    private fun writeResultsToCSV() {
+        val dir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
+        val csvFile = File(dir, "sieve_results.csv")
+        csvWriter().open(csvFile) {
+            writeRow("Language", "Type", "n", "Time (ms)", "PrimeCount", "Correct")
+            resultsCSV.forEach { row ->
+                writeRow(
+                    row.language,
+                    row.type,
+                    row.n,
+                    row.timeMs,
+                    row.primeCount,
+                    row.correct
+                )
+            }
+        }
+        println("Results written to: ${csvFile.absolutePath}")
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,6 +217,11 @@ class MainActivity : AppCompatActivity() {
                     binding.resultsParallelCTime.text = "$avgResultsParallelC"
                 }
             }
+        }
+
+        lifecycleScope.launch {
+            runWarmup()
+            runTests()
         }
     }
 
@@ -224,102 +342,6 @@ class MainActivity : AppCompatActivity() {
 
         // results + parallel: cpp, c
 
-    }
-
-
-    private external fun sieveCpp(n: Int): Int
-
-    private external fun sieveResultsCpp(n: Int): ArrayList<Int>
-
-    private external fun sieveParallelCpp(n: Int): Int
-
-    private external fun sieveResultsParallelCpp(n: Int): ArrayList<Int>
-
-    private external fun sieveC(n: Int): Int
-
-    private external fun sieveResultsC(n: Int): ArrayList<Int>
-
-    private external fun sieveParallelC(n: Int): Int
-
-    private external fun sieveResultsParallelC(n: Int): ArrayList<Int>
-
-    private suspend fun sieveKotlin(n: Int): Int = withContext(Dispatchers.Default) {
-        val isPrime = BooleanArray(n + 1) { true }
-
-        if (n >= 0) isPrime[0] = false
-        if (n >= 1) isPrime[1] = false
-
-        val limit = sqrt(n.toDouble()).toInt()
-
-        for (i in 2..limit) {
-            if (isPrime[i]) {
-                for (j in i * i..n step i) {
-                    isPrime[j] = false
-                }
-            }
-        }
-
-        val primesCount = isPrime.count { it }
-
-        return@withContext primesCount
-    }
-
-    private suspend fun sieveResultsKotlin(n: Int): ArrayList<Int> = withContext(Dispatchers.Default) {
-        val isPrime = BooleanArray(n + 1) { true }
-
-        if (n >= 0) isPrime[0] = false
-        if (n >= 1) isPrime[1] = false
-
-        val limit = sqrt(n.toDouble()).toInt()
-
-        for (i in 2..limit) {
-            if (isPrime[i]) {
-                for (j in i * i..n step i) {
-                    isPrime[j] = false
-                }
-            }
-        }
-
-        val primes = ArrayList<Int>()
-        for (i in 2..n) {
-            if (isPrime[i]) {
-                primes.add(i)
-            }
-        }
-
-        return@withContext primes
-    }
-
-    private suspend fun sieveParallelKotlin(n: Int): Int = withContext(Dispatchers.Default) {
-        val isPrime = BooleanArray(n + 1) { true }
-
-        if (n >= 0) isPrime[0] = false
-        if (n >= 1) isPrime[1] = false
-
-        val limit = sqrt(n.toDouble()).toInt()
-        val numThreads = Runtime.getRuntime().availableProcessors()
-        val chunkSize = (limit - 2 + 1) / numThreads
-
-        val jobs = (0 until numThreads).map { threadIndex ->
-            val start = 2 + threadIndex * chunkSize
-            val end = if (threadIndex == numThreads - 1) limit else start + chunkSize - 1
-
-            launch(Dispatchers.Default) {
-                for (i in start..end) {
-                    if (isPrime[i]) {
-                        for (j in i * i..n step i) {
-                            isPrime[j] = false
-                        }
-                    }
-                }
-            }
-        }
-
-        jobs.forEach { it.join() }
-
-        val primesCount = isPrime.count { it }
-
-        return@withContext primesCount
     }
 
     companion object {

@@ -54,4 +54,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation(kotlin("reflect"))
+    implementation("com.jsoizo:kotlin-csv-jvm:1.10.0")
 }
