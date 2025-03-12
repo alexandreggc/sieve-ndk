@@ -12,12 +12,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="158dp"
-        android:layout_marginTop="220dp"
         android:layout_marginEnd="159dp"
         android:text="Exec Tests"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/n_primes" />
 
     <EditText
         android:id="@+id/n_primes"
@@ -28,7 +27,6 @@
         android:ems="10"
         android:hint="Input n for Sieve"
         android:inputType="number"
-        android:text="1000000"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
@@ -38,185 +36,62 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="100dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="50dp"
         android:layout_marginEnd="174dp"
         android:text="N parameter for Sieve"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_exec" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/times_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="177dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="176dp"
         android:text="Average Time (ms)"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.475"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/n_primes" />
+        app:layout_constraintTop_toBottomOf="@+id/button_exec" />
 
-    <TableLayout
-        android:id="@+id/tableLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="432dp"
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/times_title">
 
-        <TableRow
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/textView5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:id="@+id/textView2"
-                android:layout_width="70dp"
-                android:layout_height="wrap_content"
-                android:text="Kotlin"
-                android:textAlignment="textEnd" />
-
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="70dp"
-                android:layout_height="wrap_content"
-                android:text="C++"
-                android:textAlignment="textEnd" />
-
-            <TextView
-                android:id="@+id/textView4"
-                android:layout_width="70dp"
-                android:layout_height="wrap_content"
-                android:text="C"
-                android:textAlignment="textEnd" />
-
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/textView6"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="default" />
-
-            <TextView
-                android:id="@+id/default_kotlin_time"
-                android:layout_width="70dp"
-                android:layout_height="wrap_content"
-                android:textAlignment="textEnd" />
-
-            <TextView
-                android:id="@+id/default_cpp_time"
-                android:layout_width="70dp"
-                android:layout_height="wrap_content"
-                android:textAlignment="textEnd" />
-
-            <TextView
-                android:id="@+id/default_c_time"
-                android:layout_width="70dp"
-                android:layout_height="wrap_content"
-                android:textAlignment="textEnd" />
-
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/textView8"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="parallelization" />
-
-            <TextView
-                android:id="@+id/parallel_kotlin_time"
-                android:layout_width="70dp"
-                android:layout_height="wrap_content"
-                android:textAlignment="textEnd" />
-
-            <TextView
-                android:id="@+id/parallel_cpp_time"
-                android:layout_width="70dp"
-                android:layout_height="wrap_content"
-                android:textAlignment="textEnd" />
-
-            <TextView
-                android:id="@+id/parallel_c_time"
-                android:layout_width="70dp"
-                android:layout_height="wrap_content"
-                android:textAlignment="textEnd" />
-
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/textView14"
+            <TableLayout
+                android:id="@+id/resultsTable"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="results" />
+                android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/resultsKotlinTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAlignment="textEnd" />
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
 
-            <TextView
-                android:id="@+id/resultsCppTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAlignment="textEnd" />
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
 
-            <TextView
-                android:id="@+id/resultsCTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAlignment="textEnd" />
-        </TableRow>
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/textView10"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="results + parallel" />
-
-            <TextView
-                android:id="@+id/resultsParallelKotlinTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAlignment="textEnd" />
-
-            <TextView
-                android:id="@+id/resultsParallelCppTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAlignment="textEnd" />
-
-            <TextView
-                android:id="@+id/resultsParallelCTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAlignment="textEnd" />
-        </TableRow>
-
-    </TableLayout>
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </TableLayout>
+        </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
