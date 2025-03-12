@@ -42,12 +42,12 @@ class MainActivity : AppCompatActivity() {
     private val warmupIterations = 5
 
     private val listN : MutableList<Int> = mutableListOf(
-        pow(2.0, 19.0).toInt(), // 524_288
-        pow(2.0, 20.0).toInt(), // 1_048_576
-        pow(2.0, 21.0).toInt(), // 2_097_152
-        pow(2.0, 22.0).toInt(), // 4_194_304
-        pow(2.0, 23.0).toInt(), // 8_388_608
-//        pow(2.0, 24.0).toInt(), // 16_777_216
+//        pow(2.0, 19.0).toInt(), // 524_288
+//        pow(2.0, 20.0).toInt(), // 1_048_576
+//        pow(2.0, 21.0).toInt(), // 2_097_152
+//        pow(2.0, 22.0).toInt(), // 4_194_304
+//        pow(2.0, 23.0).toInt(), // 8_388_608
+        pow(2.0, 24.0).toInt(), // 16_777_216
 //        pow(2.0, 25.0).toInt(), // 33_554_432
 //        pow(2.0, 26.0).toInt(), // 67_108_864
 //        pow(2.0, 27.0).toInt(), // 134_217_728
@@ -68,9 +68,9 @@ class MainActivity : AppCompatActivity() {
         println("\n\nWarmup ...")
         val algoNPair = listN.flatMap { n -> algorithms.map { n to it } }
 
-        println(String.format(Locale.getDefault(), "%-50s | %10s", "Algorithm", "N primes"))
+        println(String.format(Locale.getDefault(), "%-30s | %10s", "Algorithm", "N primes"))
         for ((n, algorithm) in algoNPair) {
-            println(String.format(Locale.getDefault(), "%-50s | %10d ", algorithm.function.name, n))
+            println(String.format(Locale.getDefault(), "%-30s | %10d ", algorithm.function.name, n))
             repeat(warmupIterations) {
                 algorithm.function.callSuspend(n)
             }
@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity() {
 
             for (algorithm in algorithms) {
                 println("\n\nTest: ${algorithm.function.name} \tN: $n ")
-                println(String.format(Locale.getDefault(),"%-10s | %10s | %10s", "Time", "Prime Count", "Correct"))
+                println(String.format(Locale.getDefault(),"%-10s | %15s | %10s", "Time", "Prime Count", "Correct"))
 
                 // Run the algorithm multiple times and check if the prime count is correct
                 val correct = BooleanArray(iterations) { false }
@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity() {
                         correct[it] = true
 
                     execTimes.add(time)
-                    println(String.format(Locale.getDefault(), "%-10d | %10d | %10s", time, primesCount, correct[it]))
+                    println(String.format(Locale.getDefault(), "%-10d | %15d | %10s", time, primesCount, correct[it]))
                 }
 
                 // Calculate average execution time and add to results

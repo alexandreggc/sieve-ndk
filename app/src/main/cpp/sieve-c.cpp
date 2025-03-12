@@ -1,14 +1,7 @@
 #include <jni.h>
-#include <string>
-#include <vector>
-#include <cmath>
-#include <algorithm>
-#include <thread>
-#include <atomic>
-#include <mutex>
-
 #include <unistd.h>
 #include <omp.h>
+#include <math.h>
 
 #include "macros.h"
 
@@ -20,7 +13,7 @@ Java_com_example_mytestapp_SieveCKt_sieveC(
         jclass clazz,
         jint n ){
 
-    bool* isPrime = (bool*)malloc((n + 1) * sizeof(bool));
+    char* isPrime = (char*)malloc((n + 1) * sizeof(char));
     if (isPrime == NULL) return NULL;
 
     for (int i = 0; i <= n; i++) {
