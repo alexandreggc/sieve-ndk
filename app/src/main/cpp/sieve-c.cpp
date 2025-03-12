@@ -35,7 +35,7 @@ Java_com_example_mytestapp_SieveCKt_sieveC(
     }
 
     int primesCount = 0;
-    for (int i = 2; i < n; i++) {
+    for (int i = 2; i <= n; i++) {
         if (isPrime[i]) {
             primesCount++;
         }
@@ -195,7 +195,7 @@ Java_com_example_mytestapp_SieveCKt_sieveResultsParallelC(
     return arrayListObj;
 }
 
-#define value(i) (2*i + 1)
+
 #define index(i) (i/2)
 #define odd(i) (i%2)
 
@@ -224,16 +224,16 @@ Java_com_example_mytestapp_SieveCKt_sieveEvenRemovedC(JNIEnv *env, jclass clazz,
         }
     }
 
-    int primesCount = 0;
+    int primeCount = 0;
     for (int i = 1; i < nEven+1; i++) {
         if (isPrime[i]) {
-            primesCount++;
+            primeCount++;
         }
     }
 
     free(isPrime);
 
-    return primesCount;
+    return primeCount;
 }
 
 extern "C"
@@ -262,16 +262,16 @@ Java_com_example_mytestapp_SieveCKt_sieveEvenRemovedParallelC(JNIEnv *env, jclas
         }
     }
 
-    int primesCount = 0;
+    int primeCount = 0;
     for (int i = 1; i < nEven+1; i++) {
         if (isPrime[i]) {
-            primesCount++;
+            primeCount++;
         }
     }
 
     free(isPrime);
 
-    return primesCount;
+    return primeCount;
 }
 
 extern "C"
@@ -310,12 +310,12 @@ Java_com_example_mytestapp_SieveCKt_sieveBitArrayC(JNIEnv *env, jclass clazz, ji
         }
     }
 
-    int countsPrime = 0;
+    int primeCount = 0;
     for (unsigned long long i = 1; i <= n; i += 2) {
         if (getbit(b, i / 2)) {
-            countsPrime++;
+            primeCount++;
         }
     }
 
-    return countsPrime;
+    return primeCount;
 }
