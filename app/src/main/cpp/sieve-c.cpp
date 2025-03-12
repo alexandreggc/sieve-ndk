@@ -4,6 +4,7 @@
 #include <math.h>
 
 #include "macros.h"
+#include "bitter.h"
 
 
 extern "C"
@@ -271,4 +272,50 @@ Java_com_example_mytestapp_SieveCKt_sieveEvenRemovedParallelC(JNIEnv *env, jclas
     free(isPrime);
 
     return primesCount;
+}
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_example_mytestapp_SieveCKt_sieveBitArrayC(JNIEnv *env, jclass clazz, jint n) {
+
+    bitter* b = create_bitter(n / 2 + 1);
+
+    if (b == NULL) {
+        return NULL;
+    }
+
+    fprintf(stderr,
+            "Using %lld bytes to store %lld bits (%lld bits unused).\n",
+            b->effectiveN, b->origN, b->effectiveN * 8 - b->origN);
+
+    fprintf(stderr, "Setting all bits to one... ");
+
+    fill(b, 1);
+
+    fprintf(stderr, "done.\n");
+
+    unsigned long sqrtn = sqrt(n) + 1;
+
+    //#pragma omp parallel for
+    for (unsigned long long i = 3; i <= sqrtn; i += 2) {
+        // printf("[%d] Found %lld to be prime. %lld is a seed: %d.\n",
+        // omp_get_thread_num(), i, i, i < sqrt(n));
+        if (getbit(b, i / 2)) {
+#pragma omp parallel for
+            for (unsigned long long j = i * i; j <= n; j += 2 * i) {
+                setbit(b, j / 2, 0);
+                // printf("[%d] marking %lld as non prime.\n",
+                // omp_get_thread_num(), j);
+            }
+        }
+    }
+
+    int countsPrime = 0;
+    for (unsigned long long i = 1; i <= n; i += 2) {
+        if (getbit(b, i / 2)) {
+            countsPrime++;
+        }
+    }
+
+    return countsPrime;
 }

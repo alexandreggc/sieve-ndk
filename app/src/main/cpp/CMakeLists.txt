@@ -31,6 +31,8 @@ add_library(${CMAKE_PROJECT_NAME} SHARED
         sieve-c.cpp
         sieve-cpp.cpp
         macros.h
+        bitter.c
+        bitter.h
 )
 
 # Specifies libraries CMake should link to your target library. You

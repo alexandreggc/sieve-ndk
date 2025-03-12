@@ -61,14 +61,15 @@ class MainActivity : AppCompatActivity() {
     private val algorithms : MutableList<SieveAlgorithm> = mutableListOf(
 //        SieveAlgorithm("Kotlin", "default", ::sieveKotlin),
 //        SieveAlgorithm("Cpp", "default", ::sieveCpp),
-//        SieveAlgorithm("C", "default", ::sieveC),
-        SieveAlgorithm("Kotlin", "parallel", ::sieveParallelKotlin),
-        SieveAlgorithm("Kotlin", "evenRemoved", ::sieveEvenRemovedKotlin),
-        SieveAlgorithm("Kotlin", "evenRemovedParallel", ::sieveEvenRemovedParallelKotlin),
+        SieveAlgorithm("C", "default", ::sieveC),
+//        SieveAlgorithm("Kotlin", "parallel", ::sieveParallelKotlin),
+//        SieveAlgorithm("Kotlin", "evenRemoved", ::sieveEvenRemovedKotlin),
+//        SieveAlgorithm("Kotlin", "evenRemovedParallel", ::sieveEvenRemovedParallelKotlin),
 //        SieveAlgorithm("Cpp", "parallel", ::sieveParallelCpp),
         SieveAlgorithm("C", "parallel", ::sieveParallelC),
-        SieveAlgorithm("C", "evenRemoved", ::sieveEvenRemovedC),
-        SieveAlgorithm("C", "evenRemovedParallel", ::sieveEvenRemovedParallelC)
+//        SieveAlgorithm("C", "evenRemoved", ::sieveEvenRemovedC),
+        SieveAlgorithm("C", "evenRemovedParallel", ::sieveEvenRemovedParallelC),
+        SieveAlgorithm("C", "bitArray", ::sieveBitArrayC),
     )
 
     private val resultsCSV = mutableListOf<ResultRow>()
