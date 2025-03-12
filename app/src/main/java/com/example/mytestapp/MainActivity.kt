@@ -38,8 +38,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
+    private val warmupIterations = 1
     private val iterations = 5
-    private val warmupIterations = 5
 
     private val listN : MutableList<Int> = mutableListOf(
 //        pow(2.0, 19.0).toInt(), // 524_288
@@ -47,20 +47,28 @@ class MainActivity : AppCompatActivity() {
 //        pow(2.0, 21.0).toInt(), // 2_097_152
 //        pow(2.0, 22.0).toInt(), // 4_194_304
 //        pow(2.0, 23.0).toInt(), // 8_388_608
-        pow(2.0, 24.0).toInt(), // 16_777_216
+//        pow(2.0, 24.0).toInt(), // 16_777_216
 //        pow(2.0, 25.0).toInt(), // 33_554_432
 //        pow(2.0, 26.0).toInt(), // 67_108_864
-//        pow(2.0, 27.0).toInt(), // 134_217_728
+        pow(2.0, 27.0).toInt(), // 134_217_728
+//        pow(2.0, 28.0).toInt(), // 268_435_456
+//        pow(2.0, 29.0).toInt(), // 536_870_912
+//        pow(2.0, 30.0).toInt(), // 1_073_741_824
+//        pow(2.0, 31.0).toInt(), // 2_147_483_648
+//        pow(2.0, 32.0).toInt()  // 4_294_967_296
     )
 
     private val algorithms : MutableList<SieveAlgorithm> = mutableListOf(
 //        SieveAlgorithm("Kotlin", "default", ::sieveKotlin),
 //        SieveAlgorithm("Cpp", "default", ::sieveCpp),
 //        SieveAlgorithm("C", "default", ::sieveC),
-//        SieveAlgorithm("Kotlin", "parallel", ::sieveParallelKotlin),
+        SieveAlgorithm("Kotlin", "parallel", ::sieveParallelKotlin),
+        SieveAlgorithm("Kotlin", "evenRemoved", ::sieveEvenRemovedKotlin),
+        SieveAlgorithm("Kotlin", "evenRemovedParallel", ::sieveEvenRemovedParallelKotlin),
 //        SieveAlgorithm("Cpp", "parallel", ::sieveParallelCpp),
         SieveAlgorithm("C", "parallel", ::sieveParallelC),
-//        SieveAlgorithm("C", "evenRemoved", ::sieveEvenRemovedC)
+        SieveAlgorithm("C", "evenRemoved", ::sieveEvenRemovedC),
+        SieveAlgorithm("C", "evenRemovedParallel", ::sieveEvenRemovedParallelC)
     )
 
     private val resultsCSV = mutableListOf<ResultRow>()

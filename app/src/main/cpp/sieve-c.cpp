@@ -194,3 +194,81 @@ Java_com_example_mytestapp_SieveCKt_sieveResultsParallelC(
     return arrayListObj;
 }
 
+#define value(i) (2*i + 1)
+#define index(i) (i/2)
+#define odd(i) (i%2)
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_example_mytestapp_SieveCKt_sieveEvenRemovedC(JNIEnv *env, jclass clazz, jint n) {
+    unsigned int nEven = n / 2;
+
+    char* isPrime = (char*)malloc((nEven + 1) * sizeof(char));
+    if (isPrime == NULL) return NULL;
+
+    for (int i = 0; i <= n; i++) {
+        isPrime[i] = true;
+    }
+
+    if (n >= 0) isPrime[0] = false;
+
+    int limit = (int)sqrt((double)n);
+
+    for (int value = 1; value <= limit; value+=2) {
+        if (isPrime[index(value)]) {
+            for (int mulValue = value * value; mulValue <= n; mulValue += value) {
+                if (odd(mulValue))
+                    isPrime[index(mulValue)] = false;
+            }
+        }
+    }
+
+    int primesCount = 0;
+    for (int i = 1; i < nEven+1; i++) {
+        if (isPrime[i]) {
+            primesCount++;
+        }
+    }
+
+    free(isPrime);
+
+    return primesCount;
+}
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_example_mytestapp_SieveCKt_sieveEvenRemovedParallelC(JNIEnv *env, jclass clazz, jint n) {
+    unsigned int nEven = n / 2;
+
+    char* isPrime = (char*)malloc((nEven + 1) * sizeof(char));
+    if (isPrime == NULL) return NULL;
+
+    for (int i = 0; i <= n; i++) {
+        isPrime[i] = true;
+    }
+
+    if (n >= 0) isPrime[0] = false;
+
+    int limit = (int)sqrt((double)n);
+
+    #pragma omp parallel for schedule(dynamic)
+    for (int value = 1; value <= limit; value+=2) {
+        if (isPrime[index(value)]) {
+            for (int mulValue = value * value; mulValue <= n; mulValue += value) {
+                if (odd(mulValue))
+                    isPrime[index(mulValue)] = false;
+            }
+        }
+    }
+
+    int primesCount = 0;
+    for (int i = 1; i < nEven+1; i++) {
+        if (isPrime[i]) {
+            primesCount++;
+        }
+    }
+
+    free(isPrime);
+
+    return primesCount;
+}

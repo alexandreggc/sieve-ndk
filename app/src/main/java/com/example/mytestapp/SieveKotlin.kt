@@ -83,3 +83,52 @@ suspend fun sieveParallelKotlin(n: Int): Int = withContext(Dispatchers.Default) 
 
     return@withContext primesCount
 }
+
+suspend fun sieveEvenRemovedKotlin(n: Int): Int = withContext(Dispatchers.Default){
+    val nEven = n / 2
+    val isPrime = BooleanArray(nEven + 1) { true }
+
+    if (n >= 0) isPrime[0] = false
+
+    val limit = sqrt(n.toDouble()).toInt()
+
+    for (value in 1..limit step 2) {
+        if (isPrime[value / 2]) {
+            for (mulValue in value * value..n step value) {
+                if (mulValue % 2 != 0) {
+                    isPrime[mulValue / 2] = false
+                }
+            }
+        }
+    }
+
+    val primesCount = isPrime.count { it }
+
+    return@withContext primesCount
+}
+
+suspend fun sieveEvenRemovedParallelKotlin(n: Int): Int = withContext(Dispatchers.Default) {
+    val nEven = n / 2
+    val isPrime = BooleanArray(nEven + 1) { true }
+
+    if (n >= 0) isPrime[0] = false
+
+    val limit = sqrt(n.toDouble()).toInt()
+
+    val jobs = (1..limit step 2).map { value ->
+        launch {
+            if (isPrime[value / 2]) {
+                for (mulValue in value * value..n step value) {
+                    if (mulValue % 2 != 0) {
+                        isPrime[mulValue / 2] = false
+                    }
+                }
+            }
+        }
+    }
+    jobs.forEach { it.join() }
+
+    val primesCount = isPrime.count { it }
+
+    return@withContext primesCount
+}
