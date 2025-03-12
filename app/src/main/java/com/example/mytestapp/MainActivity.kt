@@ -54,12 +54,13 @@ class MainActivity : AppCompatActivity() {
     )
 
     private val algorithms : MutableList<SieveAlgorithm> = mutableListOf(
-        SieveAlgorithm("Kotlin", "default", ::sieveKotlin),
-        SieveAlgorithm("Cpp", "default", ::sieveCpp),
-        SieveAlgorithm("C", "default", ::sieveC),
-        SieveAlgorithm("Kotlin", "parallel", ::sieveParallelKotlin),
-        SieveAlgorithm("Cpp", "parallel", ::sieveParallelCpp),
+//        SieveAlgorithm("Kotlin", "default", ::sieveKotlin),
+//        SieveAlgorithm("Cpp", "default", ::sieveCpp),
+//        SieveAlgorithm("C", "default", ::sieveC),
+//        SieveAlgorithm("Kotlin", "parallel", ::sieveParallelKotlin),
+//        SieveAlgorithm("Cpp", "parallel", ::sieveParallelCpp),
         SieveAlgorithm("C", "parallel", ::sieveParallelC),
+//        SieveAlgorithm("C", "evenRemoved", ::sieveEvenRemovedC)
     )
 
     private val resultsCSV = mutableListOf<ResultRow>()
@@ -89,15 +90,18 @@ class MainActivity : AppCompatActivity() {
 
                 // Run the algorithm multiple times and check if the prime count is correct
                 val correct = BooleanArray(iterations) { false }
+                var primesCountError = 0
                 execTimes.clear()
 
                 repeat(iterations) {
-                    var primesCount = 0
+                    var primesCount: Int
                     val time = measureTime {
                         primesCount = algorithm.function.callSuspend(n)
                     }.inWholeMilliseconds
-                    if (primesCount != primeCount1)
+                    if (primesCount != primeCount1){
+                        primesCountError = primesCount
                         Log.e("PRIME COUNT", "Incorrect prime count: $primesCount")
+                    }
                     else
                         correct[it] = true
 
@@ -107,8 +111,10 @@ class MainActivity : AppCompatActivity() {
 
                 // Calculate average execution time and add to results
                 val avgExecTime = execTimes.average().toLong()
+                val correctResult = correct.all { it }
+                val primesCountResult = if (correctResult) primeCount1 else primesCountError
                 println("Average time: $avgExecTime")
-                resultsCSV.add(ResultRow(algorithm.language, algorithm.type, n, avgExecTime, primeCount1, correct.all { it }))
+                resultsCSV.add(ResultRow(algorithm.language, algorithm.type, n, avgExecTime, primesCountResult, correctResult))
             }
         }
     }
