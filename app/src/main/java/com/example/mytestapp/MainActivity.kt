@@ -38,10 +38,18 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private val warmupIterations = 1
+    private val warmupIterations = 3
     private val iterations = 5
 
+//    private val listN: MutableList<Int> = (0..100).toMutableList()
+
     private val listN : MutableList<Int> = mutableListOf(
+//        pow(2.0, 13.0).toInt(), // 8_192
+//        pow(2.0, 14.0).toInt(), // 16_384
+//        pow(2.0, 15.0).toInt(), // 32_768
+//        pow(2.0, 16.0).toInt(), // 65_536
+//        pow(2.0, 17.0).toInt(), // 131_072
+//        pow(2.0, 18.0).toInt(), // 262_144
 //        pow(2.0, 19.0).toInt(), // 524_288
 //        pow(2.0, 20.0).toInt(), // 1_048_576
 //        pow(2.0, 21.0).toInt(), // 2_097_152
@@ -50,8 +58,8 @@ class MainActivity : AppCompatActivity() {
 //        pow(2.0, 24.0).toInt(), // 16_777_216
 //        pow(2.0, 25.0).toInt(), // 33_554_432
 //        pow(2.0, 26.0).toInt(), // 67_108_864
-        pow(2.0, 27.0).toInt(), // 134_217_728
-//        pow(2.0, 28.0).toInt(), // 268_435_456
+//        pow(2.0, 27.0).toInt(), // 134_217_728
+        pow(2.0, 28.0).toInt(), // 268_435_456
 //        pow(2.0, 29.0).toInt(), // 536_870_912
 //        pow(2.0, 30.0).toInt(), // 1_073_741_824
 //        pow(2.0, 31.0).toInt(), // 2_147_483_648
@@ -61,15 +69,16 @@ class MainActivity : AppCompatActivity() {
     private val algorithms : MutableList<SieveAlgorithm> = mutableListOf(
 //        SieveAlgorithm("Kotlin", "default", ::sieveKotlin),
 //        SieveAlgorithm("Cpp", "default", ::sieveCpp),
-        SieveAlgorithm("C", "default", ::sieveC),
+//        SieveAlgorithm("C", "default", ::sieveC),
 //        SieveAlgorithm("Kotlin", "parallel", ::sieveParallelKotlin),
 //        SieveAlgorithm("Kotlin", "evenRemoved", ::sieveEvenRemovedKotlin),
-//        SieveAlgorithm("Kotlin", "evenRemovedParallel", ::sieveEvenRemovedParallelKotlin),
+        SieveAlgorithm("Kotlin", "evenRemovedParallel", ::sieveEvenRemovedParallelKotlin),
+//        SieveAlgorithm("Kotlin", "bitArray", ::sieveBitArrayKotlin),
 //        SieveAlgorithm("Cpp", "parallel", ::sieveParallelCpp),
-        SieveAlgorithm("C", "parallel", ::sieveParallelC),
+//        SieveAlgorithm("C", "parallel", ::sieveParallelC),
 //        SieveAlgorithm("C", "evenRemoved", ::sieveEvenRemovedC),
         SieveAlgorithm("C", "evenRemovedParallel", ::sieveEvenRemovedParallelC),
-        SieveAlgorithm("C", "bitArray", ::sieveBitArrayC),
+//        SieveAlgorithm("C", "bitArray", ::sieveBitArrayC),
     )
 
     private val resultsCSV = mutableListOf<ResultRow>()
@@ -82,7 +91,11 @@ class MainActivity : AppCompatActivity() {
         for ((n, algorithm) in algoNPair) {
             println(String.format(Locale.getDefault(), "%-30s | %10d ", algorithm.function.name, n))
             repeat(warmupIterations) {
-                algorithm.function.callSuspend(n)
+                try {
+                    algorithm.function.callSuspend(n)
+                } catch (e: Exception) {
+                    Log.e("Warmup", "Error in warmup for n=$n: ${e.cause}")
+                }
             }
         }
     }
