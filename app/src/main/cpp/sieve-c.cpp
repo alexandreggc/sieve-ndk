@@ -239,31 +239,31 @@ Java_com_example_mytestapp_SieveCKt_sieveEvenRemovedC(JNIEnv *env, jclass clazz,
 extern "C"
 JNIEXPORT jint JNICALL
 Java_com_example_mytestapp_SieveCKt_sieveEvenRemovedParallelC(JNIEnv *env, jclass clazz, jint n) {
-    unsigned int nEven = n / 2;
+    unsigned long long nEven = n / 2;
 
     char* isPrime = (char*)malloc((nEven + 1) * sizeof(char));
     if (isPrime == NULL) return NULL;
 
-    for (int i = 0; i <= n; i++) {
-        isPrime[i] = true;
+    for (unsigned long long i = 0; i <= nEven; i++) {
+        isPrime[i] = 1;
     }
 
-    if (n >= 0) isPrime[0] = false;
+    if (n >= 0) isPrime[0] = 0;
 
-    int limit = (int)sqrt((double)n);
+    unsigned long limit = sqrt((double)n);
 
     #pragma omp parallel for schedule(dynamic)
-    for (int value = 1; value <= limit; value+=2) {
-        if (isPrime[index(value)]) {
-            for (int mulValue = value * value; mulValue <= n; mulValue += value) {
-                if (odd(mulValue))
-                    isPrime[index(mulValue)] = false;
+    for (unsigned long long value = 1; value <= limit; value+=2) {
+        if (isPrime[value / 2]) {
+            for (unsigned long long mulValue = value * value; mulValue <= n; mulValue += value) {
+                if (mulValue % 2)
+                    isPrime[mulValue / 2] = 0;
             }
         }
     }
 
-    int primeCount = 0;
-    for (int i = 1; i < nEven+1; i++) {
+    unsigned long long primeCount = 0;
+    for (unsigned long long i = 1; i <= nEven; i++) {
         if (isPrime[i]) {
             primeCount++;
         }
@@ -296,12 +296,12 @@ Java_com_example_mytestapp_SieveCKt_sieveBitArrayC(JNIEnv *env, jclass clazz, ji
 
     unsigned long sqrtn = sqrt(n) + 1;
 
-    //#pragma omp parallel for
+#pragma omp parallel for schedule(dynamic)
     for (unsigned long long i = 3; i <= sqrtn; i += 2) {
         // printf("[%d] Found %lld to be prime. %lld is a seed: %d.\n",
         // omp_get_thread_num(), i, i, i < sqrt(n));
         if (getbit(b, i / 2)) {
-#pragma omp parallel for
+//#pragma omp parallel for
             for (unsigned long long j = i * i; j <= n; j += 2 * i) {
                 setbit(b, j / 2, 0);
                 // printf("[%d] marking %lld as non prime.\n",
