@@ -8,34 +8,34 @@
 
 
 extern "C"
-JNIEXPORT jint JNICALL
+JNIEXPORT jlong JNICALL
 Java_com_example_mytestapp_SieveCKt_sieveC(
         JNIEnv *env,
         jclass clazz,
-        jint n ){
+        jlong n ){
 
     char* isPrime = (char*)malloc((n + 1) * sizeof(char));
     if (isPrime == NULL) return NULL;
 
-    for (int i = 0; i <= n; i++) {
+    for (long long i = 0; i <= n; i++) {
         isPrime[i] = true;
     }
 
     if (n >= 0) isPrime[0] = false;
     if (n >= 1) isPrime[1] = false;
 
-    int limit = (int)sqrt((double)n);
+    unsigned long long limit = sqrt((double)n);
 
-    for (int i = 2; i <= limit; i++) {
+    for (unsigned long long i = 2; i <= limit; i++) {
         if (isPrime[i]) {
-            for (int j = i * i; j <= n; j += i) {
+            for (unsigned long long j = i * i; j <= n; j += i) {
                 isPrime[j] = false;
             }
         }
     }
 
-    int primesCount = 0;
-    for (int i = 2; i <= n; i++) {
+    long long primesCount = 0;
+    for (unsigned long long i = 2; i <= n; i++) {
         if (isPrime[i]) {
             primesCount++;
         }
@@ -51,23 +51,23 @@ JNIEXPORT jobject JNICALL
 Java_com_example_mytestapp_SieveCKt_sieveResultsC(
         JNIEnv *env,
         jclass clazz,
-        jint n) {
+        jlong n) {
 
     bool* isPrime = (bool*)malloc((n + 1) * sizeof(bool));
-    if (isPrime == NULL) return NULL;
+    if (isPrime == 0) return 0;
 
-    for (int i = 0; i <= n; i++) {
+    for (unsigned long long i = 0; i <= n; i++) {
         isPrime[i] = true;
     }
 
     if (n >= 0) isPrime[0] = false;
     if (n >= 1) isPrime[1] = false;
 
-    int limit = (int)sqrt((double)n);
+    unsigned long long limit = sqrt((double)n);
 
-    for (int i = 2; i <= limit; i++) {
+    for (unsigned long long i = 2; i <= limit; i++) {
         if (isPrime[i]) {
-            for (int j = i * i; j <= n; j += i) {
+            for (unsigned long long j = i * i; j <= n; j += i) {
                 isPrime[j] = false;
             }
         }
@@ -79,16 +79,16 @@ Java_com_example_mytestapp_SieveCKt_sieveResultsC(
 
     jmethodID addMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
 
-    jclass integerClass = env->FindClass("java/lang/Integer");
-    jmethodID integerConstructor = env->GetMethodID(integerClass, "<init>", "(I)V");
+    jclass longClass = env->FindClass("java/lang/Long");
+    jmethodID longConstructor = env->GetMethodID(longClass, "<init>", "(J)V");
 
-    for (int i=2; i<n; i++) {
+    for (long long i=2; i<n; i++) {
         if (isPrime[i]) {
-            jobject primeIntegerObj = env->NewObject(integerClass, integerConstructor, i);
+            jobject primeLongObj = env->NewObject(longClass, longConstructor, i);
 
-            env->CallBooleanMethod(arrayListObj, addMethod, primeIntegerObj);
+            env->CallBooleanMethod(arrayListObj, addMethod, primeLongObj);
 
-            env->DeleteLocalRef(primeIntegerObj);
+            env->DeleteLocalRef(primeLongObj);
         }
     }
 
@@ -99,34 +99,34 @@ Java_com_example_mytestapp_SieveCKt_sieveResultsC(
 
 
 extern "C"
-JNIEXPORT jint JNICALL
+JNIEXPORT jlong JNICALL
 Java_com_example_mytestapp_SieveCKt_sieveParallelC(
         JNIEnv *env,
         jclass clazz,
-        jint n) {
+        jlong n) {
     bool* isPrime = (bool*)malloc((n + 1) * sizeof(bool));
     if (!isPrime) return 0;
 
-    for (int i = 0; i <= n; i++) {
+    for (unsigned long long i = 0; i <= n; i++) {
         isPrime[i] = true;
     }
     if (n >= 0) isPrime[0] = false;
     if (n >= 1) isPrime[1] = false;
 
-    int limit = (int)sqrt((double)n);
+    unsigned long long limit = sqrt((double)n);
 
 #pragma omp parallel for schedule(dynamic)
-    for (int i = 2; i <= limit; i++) {
+    for (unsigned long long i = 2; i <= limit; i++) {
         if (isPrime[i]) {
-            for (int j = i * i; j <= n; j += i) {
+            for (unsigned long long j = i * i; j <= n; j += i) {
                 isPrime[j] = false;
             }
         }
     }
 
-    int primeCount = 0;
+    long long primeCount = 0;
 #pragma omp parallel for reduction(+:primeCount)
-    for (int i = 2; i <= n; i++) {
+    for (unsigned long long i = 2; i <= n; i++) {
         if (isPrime[i]) {
             primeCount++;
         }
@@ -142,32 +142,25 @@ JNIEXPORT jobject JNICALL
 Java_com_example_mytestapp_SieveCKt_sieveResultsParallelC(
         JNIEnv *env,
         jclass clazz,
-        jint n) {
+        jlong n) {
 
     bool* isPrime = (bool*)malloc((n + 1) * sizeof(bool));
     if (!isPrime) return 0;
 
-    for (int i = 0; i <= n; i++) {
+    for (unsigned long long i = 0; i <= n; i++) {
         isPrime[i] = true;
     }
     if (n >= 0) isPrime[0] = false;
     if (n >= 1) isPrime[1] = false;
 
-    int limit = (int)sqrt((double)n);
+    unsigned long long limit = sqrt((double)n);
 
 #pragma omp parallel for schedule(dynamic)
-    for (int i = 2; i <= limit; i++) {
+    for (unsigned long long i = 2; i <= limit; i++) {
         if (isPrime[i]) {
-            for (int j = i * i; j <= n; j += i) {
+            for (unsigned long long j = i * i; j <= n; j += i) {
                 isPrime[j] = false;
             }
-        }
-    }
-
-    int primeCount = 0;
-    for (int i = 2; i <= n; i++) {
-        if (isPrime[i]) {
-            primeCount++;
         }
     }
 
@@ -177,16 +170,16 @@ Java_com_example_mytestapp_SieveCKt_sieveResultsParallelC(
 
     jmethodID addMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
 
-    jclass integerClass = env->FindClass("java/lang/Integer");
-    jmethodID integerConstructor = env->GetMethodID(integerClass, "<init>", "(I)V");
+    jclass longClass = env->FindClass("java/lang/Long");
+    jmethodID longConstructor = env->GetMethodID(longClass, "<init>", "(J)V");
 
-    for (int i=2; i<n; i++) {
+    for (long long i=2; i<n; i++) {
         if (isPrime[i]) {
-            jobject primeIntegerObj = env->NewObject(integerClass, integerConstructor, i);
+            jobject primeLongObj = env->NewObject(longClass, longConstructor, i);
 
-            env->CallBooleanMethod(arrayListObj, addMethod, primeIntegerObj);
+            env->CallBooleanMethod(arrayListObj, addMethod, primeLongObj);
 
-            env->DeleteLocalRef(primeIntegerObj);
+            env->DeleteLocalRef(primeLongObj);
         }
     }
 
@@ -200,32 +193,32 @@ Java_com_example_mytestapp_SieveCKt_sieveResultsParallelC(
 #define odd(i) (i%2)
 
 extern "C"
-JNIEXPORT jint JNICALL
-Java_com_example_mytestapp_SieveCKt_sieveEvenRemovedC(JNIEnv *env, jclass clazz, jint n) {
-    unsigned int nEven = n / 2;
+JNIEXPORT jlong JNICALL
+Java_com_example_mytestapp_SieveCKt_sieveEvenRemovedC(JNIEnv *env, jclass clazz, jlong n) {
+    unsigned long long nEven = n / 2;
 
     char* isPrime = (char*)malloc((nEven + 1) * sizeof(char));
     if (isPrime == NULL) return NULL;
 
-    for (int i = 0; i <= n; i++) {
+    for (unsigned long long i = 0; i <= nEven; i++) {
         isPrime[i] = true;
     }
 
     if (n >= 0) isPrime[0] = false;
 
-    int limit = (int)sqrt((double)n);
+    unsigned long long limit = sqrt((double)n);
 
-    for (int value = 1; value <= limit; value+=2) {
+    for (unsigned long long value = 1; value <= limit; value+=2) {
         if (isPrime[index(value)]) {
-            for (int mulValue = value * value; mulValue <= n; mulValue += value) {
+            for (unsigned long long mulValue = value * value; mulValue <= n; mulValue += value) {
                 if (odd(mulValue))
                     isPrime[index(mulValue)] = false;
             }
         }
     }
 
-    int primeCount = 0;
-    for (int i = 1; i < nEven+1; i++) {
+    long long primeCount = 0;
+    for (unsigned long long i = 1; i < nEven+1; i++) {
         if (isPrime[i]) {
             primeCount++;
         }
@@ -237,8 +230,8 @@ Java_com_example_mytestapp_SieveCKt_sieveEvenRemovedC(JNIEnv *env, jclass clazz,
 }
 
 extern "C"
-JNIEXPORT jint JNICALL
-Java_com_example_mytestapp_SieveCKt_sieveEvenRemovedParallelC(JNIEnv *env, jclass clazz, jint n) {
+JNIEXPORT jlong JNICALL
+Java_com_example_mytestapp_SieveCKt_sieveEvenRemovedParallelC(JNIEnv *env, jclass clazz, jlong n) {
     unsigned long long nEven = n / 2;
 
     char* isPrime = (char*)malloc((nEven + 1) * sizeof(char));
@@ -262,7 +255,7 @@ Java_com_example_mytestapp_SieveCKt_sieveEvenRemovedParallelC(JNIEnv *env, jclas
         }
     }
 
-    unsigned long long primeCount = 0;
+    long long primeCount = 0;
     for (unsigned long long i = 1; i <= nEven; i++) {
         if (isPrime[i]) {
             primeCount++;
@@ -275,8 +268,8 @@ Java_com_example_mytestapp_SieveCKt_sieveEvenRemovedParallelC(JNIEnv *env, jclas
 }
 
 extern "C"
-JNIEXPORT jint JNICALL
-Java_com_example_mytestapp_SieveCKt_sieveBitArrayC(JNIEnv *env, jclass clazz, jint n) {
+JNIEXPORT jlong JNICALL
+Java_com_example_mytestapp_SieveCKt_sieveBitArrayC(JNIEnv *env, jclass clazz, jlong n) {
 
     bitter* b = create_bitter(n / 2 + 1);
 
@@ -310,7 +303,7 @@ Java_com_example_mytestapp_SieveCKt_sieveBitArrayC(JNIEnv *env, jclass clazz, ji
         }
     }
 
-    int primeCount = 0;
+    long long primeCount = 0;
     for (unsigned long long i = 1; i <= n; i += 2) {
         if (getbit(b, i / 2)) {
             primeCount++;

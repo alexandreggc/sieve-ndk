@@ -15,21 +15,22 @@
 // C++ implementations: default, results, parallel, results + parallel
 
 extern "C"
-JNIEXPORT jint JNICALL
+JNIEXPORT jlong JNICALL
 Java_com_example_mytestapp_SieveCppKt_sieveCpp(
         JNIEnv *env,
         jclass clazz,
-        jint n ) {
+        jlong n ) {
 
     std::vector<bool> isPrime(n + 1, true);
 
     if (n >= 0) isPrime[0] = false;
     if (n >= 1) isPrime[1] = false;
 
-    int limit = static_cast<int>(std::sqrt(n));
-    for (int i = 2; i <= limit; ++i) {
+    auto limit = static_cast<unsigned long long>(std::sqrt(n));
+
+    for (unsigned long long i = 2; i <= limit; ++i) {
         if (isPrime[i]) {
-            for (int j = i * i; j <= n; j += i) {
+            for (unsigned long long j = i * i; j <= n; j += i) {
                 isPrime[j] = false;
             }
         }
@@ -46,16 +47,16 @@ JNIEXPORT jobject JNICALL
 Java_com_example_mytestapp_SieveCppKt_sieveResultsCpp(
         JNIEnv *env,
         jclass clazz,
-        jint n) {
+        jlong n) {
     std::vector<bool> isPrime(n + 1, true);
 
     if (n >= 0) isPrime[0] = false;
     if (n >= 1) isPrime[1] = false;
 
-    int limit = static_cast<int>(std::sqrt(n));
-    for (int i = 2; i <= limit; ++i) {
+    auto limit = static_cast<unsigned long long>(std::sqrt(n));
+    for (unsigned long long i = 2; i <= limit; ++i) {
         if (isPrime[i]) {
-            for (int j = i * i; j <= n; j += i) {
+            for (unsigned long long j = i * i; j <= n; j += i) {
                 isPrime[j] = false;
             }
         }
@@ -67,16 +68,16 @@ Java_com_example_mytestapp_SieveCppKt_sieveResultsCpp(
 
     jmethodID addMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
 
-    jclass integerClass = env->FindClass("java/lang/Integer");
-    jmethodID integerConstructor = env->GetMethodID(integerClass, "<init>", "(I)V");
+    jclass longClass = env->FindClass("java/lang/Long");
+    jmethodID longConstructor = env->GetMethodID(longClass, "<init>", "(J)V");
 
-    for (int i = 2; i <= n; ++i) {
+    for (long long i = 2; i <= n; ++i) {
         if (isPrime[i]) {
-            jobject primeIntegerObj = env->NewObject(integerClass, integerConstructor, i);
+            jobject primeLongObj = env->NewObject(longClass, longConstructor, i);
 
-            env->CallBooleanMethod(arrayListObj, addMethod, primeIntegerObj);
+            env->CallBooleanMethod(arrayListObj, addMethod, primeLongObj);
 
-            env->DeleteLocalRef(primeIntegerObj);
+            env->DeleteLocalRef(primeLongObj);
         }
     }
 
@@ -85,17 +86,17 @@ Java_com_example_mytestapp_SieveCppKt_sieveResultsCpp(
 
 
 extern "C"
-JNIEXPORT jint JNICALL
+JNIEXPORT jlong JNICALL
 Java_com_example_mytestapp_SieveCppKt_sieveParallelCpp(
         JNIEnv *env,
         jclass clazz,
-        jint n) {
+        jlong n) {
 
     std::vector<bool> isPrime(n + 1, true);
     if (n >= 0) isPrime[0] = false;
     if (n >= 1) isPrime[1] = false;
 
-    int limit = static_cast<int>(std::sqrt(n));
+    auto limit = static_cast<unsigned long long>(std::sqrt(n));
 
     /*LOGI("Num Procs: %d", omp_get_num_procs());
     LOGI("Num Threads: %d", omp_get_num_threads());*/
@@ -113,7 +114,7 @@ Java_com_example_mytestapp_SieveCppKt_sieveParallelCpp(
         }
     }
 
-    return static_cast<int>(std::count(isPrime.begin(), isPrime.end(), true));
+    return static_cast<long long>(std::count(isPrime.begin(), isPrime.end(), true));
 }
 
 extern "C"
@@ -121,18 +122,18 @@ JNIEXPORT jobject JNICALL
 Java_com_example_mytestapp_SieveCppKt_sieveResultsParallelCpp(
         JNIEnv *env,
         jclass clazz,
-        jint n) {
+        jlong n) {
 
     std::vector<bool> isPrime(n + 1, true);
     if (n >= 0) isPrime[0] = false;
     if (n >= 1) isPrime[1] = false;
 
-    int limit = static_cast<int>(std::sqrt(n));
+    auto limit = static_cast<unsigned long long>(std::sqrt(n));
 
 #pragma omp parallel for schedule(dynamic)
-    for (int i = 2; i <= limit; ++i) {
+    for (unsigned long long i = 2; i <= limit; ++i) {
         if (isPrime[i]) {
-            for (int j = i * i; j <= n; j += i) {
+            for (unsigned long long j = i * i; j <= n; j += i) {
                 isPrime[j] = false;
             }
         }
@@ -145,16 +146,16 @@ Java_com_example_mytestapp_SieveCppKt_sieveResultsParallelCpp(
 
     jmethodID addMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
 
-    jclass integerClass = env->FindClass("java/lang/Integer");
-    jmethodID integerConstructor = env->GetMethodID(integerClass, "<init>", "(I)V");
+    jclass longClass = env->FindClass("java/lang/Long");
+    jmethodID longConstructor = env->GetMethodID(longClass, "<init>", "(J)V");
 
-    for (int i = 2; i <= n; i++) {
+    for (long long i = 2; i <= n; i++) {
         if (isPrime[i]) {
-            jobject primeIntegerObj = env->NewObject(integerClass, integerConstructor, i);
+            jobject primeLongObj = env->NewObject(longClass, longConstructor, i);
 
-            env->CallBooleanMethod(arrayListObj, addMethod, primeIntegerObj);
+            env->CallBooleanMethod(arrayListObj, addMethod, primeLongObj);
 
-            env->DeleteLocalRef(primeIntegerObj);
+            env->DeleteLocalRef(primeLongObj);
         }
     }
 

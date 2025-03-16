@@ -1,9 +1,9 @@
 package com.example.mytestapp
 
-external fun sieveCpp(n: Int): Int
+external fun sieveCpp(n: Long): Long
 
-external fun sieveResultsCpp(n: Int): ArrayList<Int>
+external fun sieveResultsCpp(n: Long): ArrayList<Long>
 
-external fun sieveParallelCpp(n: Int): Int
+external fun sieveParallelCpp(n: Long): Long
 
-external fun sieveResultsParallelCpp(n: Int): ArrayList<Int>
+external fun sieveResultsParallelCpp(n: Long): ArrayList<Long>

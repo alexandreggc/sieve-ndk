@@ -14,25 +14,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.Math.pow
 import java.util.Locale
-import kotlin.reflect.KFunction
 import kotlin.reflect.full.callSuspend
 import kotlin.time.measureTime
 import java.io.File
 
-data class SieveAlgorithm(
-    val language: String,
-    val type: String,
-    val function: KFunction<Int>
-)
-
-data class ResultRow(
-    val language: String,
-    val type: String,
-    val n: Int,
-    val timeMs: Long,
-    val primeCount: Int,
-    val correct: Boolean
-)
 
 class MainActivity : AppCompatActivity() {
 
@@ -41,44 +26,46 @@ class MainActivity : AppCompatActivity() {
     private val warmupIterations = 3
     private val iterations = 5
 
-//    private val listN: MutableList<Int> = (0..100).toMutableList()
-
-    private val listN : MutableList<Int> = mutableListOf(
-//        pow(2.0, 13.0).toInt(), // 8_192
-//        pow(2.0, 14.0).toInt(), // 16_384
-//        pow(2.0, 15.0).toInt(), // 32_768
-//        pow(2.0, 16.0).toInt(), // 65_536
-//        pow(2.0, 17.0).toInt(), // 131_072
-//        pow(2.0, 18.0).toInt(), // 262_144
-//        pow(2.0, 19.0).toInt(), // 524_288
-//        pow(2.0, 20.0).toInt(), // 1_048_576
-//        pow(2.0, 21.0).toInt(), // 2_097_152
-//        pow(2.0, 22.0).toInt(), // 4_194_304
-//        pow(2.0, 23.0).toInt(), // 8_388_608
-//        pow(2.0, 24.0).toInt(), // 16_777_216
-//        pow(2.0, 25.0).toInt(), // 33_554_432
-//        pow(2.0, 26.0).toInt(), // 67_108_864
-//        pow(2.0, 27.0).toInt(), // 134_217_728
-        pow(2.0, 28.0).toInt(), // 268_435_456
-//        pow(2.0, 29.0).toInt(), // 536_870_912
-//        pow(2.0, 30.0).toInt(), // 1_073_741_824
-//        pow(2.0, 31.0).toInt(), // 2_147_483_648
-//        pow(2.0, 32.0).toInt()  // 4_294_967_296
+    private val listN : MutableList<Long> = mutableListOf(
+//        pow(2.0, 13.0).toLong(), // 8_192
+//        pow(2.0, 14.0).toLong(), // 16_384
+//        pow(2.0, 15.0).toLong(), // 32_768
+//        pow(2.0, 16.0).toLong(), // 65_536
+//        pow(2.0, 17.0).toLong(), // 131_072
+//        pow(2.0, 18.0).toLong(), // 262_144
+//        pow(2.0, 19.0).toLong(), // 524_288
+//        pow(2.0, 20.0).toLong(), // 1_048_576
+        pow(2.0, 21.0).toLong(), // 2_097_152
+//        pow(2.0, 22.0).toLong(), // 4_194_304
+//        pow(2.0, 23.0).toLong(), // 8_388_608
+//        pow(2.0, 24.0).toLong(), // 16_777_216
+//        pow(2.0, 25.0).toLong(), // 33_554_432
+//        pow(2.0, 26.0).toLong(), // 67_108_864
+//        pow(2.0, 27.0).toLong(), // 134_217_728
+//        pow(2.0, 28.0).toLong(), // 268_435_456 // MAX Kotlin evenRemovedParallel fails Realme
+//        pow(2.0, 29.0).toLong(), // 536_870_912
+//        pow(2.0, 30.0).toLong(), // 1_073_741_824 // kotlin evenRemovedParallel fails EMULATOR
+//        pow(2.0, 31.0).toLong(), // 2_147_483_648 // kotlin evenRemovedParallel fails
+//        pow(2.0, 32.0).toLong(), // 4_294_967_296 // kotlin evenRemovedParallel fails
+//        pow(2.0, 33.0).toLong(),  // 8_589_934_592 // MAX for C evenRemovedParallel Realme
+//        pow(2.0, 34.0).toLong(),  // 17_179_869_184
+//        pow(2.0, 35.0).toLong(),  // 34_359_738_368
+//        pow(2.0, 36.0).toLong(),  // 68_719_476_736
     )
 
-    private val algorithms : MutableList<SieveAlgorithm> = mutableListOf(
-//        SieveAlgorithm("Kotlin", "default", ::sieveKotlin),
-//        SieveAlgorithm("Cpp", "default", ::sieveCpp),
-//        SieveAlgorithm("C", "default", ::sieveC),
-//        SieveAlgorithm("Kotlin", "parallel", ::sieveParallelKotlin),
-//        SieveAlgorithm("Kotlin", "evenRemoved", ::sieveEvenRemovedKotlin),
-        SieveAlgorithm("Kotlin", "evenRemovedParallel", ::sieveEvenRemovedParallelKotlin),
-//        SieveAlgorithm("Kotlin", "bitArray", ::sieveBitArrayKotlin),
-//        SieveAlgorithm("Cpp", "parallel", ::sieveParallelCpp),
-//        SieveAlgorithm("C", "parallel", ::sieveParallelC),
-//        SieveAlgorithm("C", "evenRemoved", ::sieveEvenRemovedC),
-        SieveAlgorithm("C", "evenRemovedParallel", ::sieveEvenRemovedParallelC),
-//        SieveAlgorithm("C", "bitArray", ::sieveBitArrayC),
+    private val algorithms : MutableList<SieveAlgorithm<Number>> = mutableListOf(
+        SieveAlgorithm(AlgLang.KOTLIN , AlgType.DEFAULT, ::sieveKotlin),
+        SieveAlgorithm(AlgLang.KOTLIN, AlgType.PARALLEL, ::sieveParallelKotlin),
+        SieveAlgorithm(AlgLang.KOTLIN, AlgType.EVEN_REMOVED, ::sieveEvenRemovedKotlin),
+        SieveAlgorithm(AlgLang.KOTLIN, AlgType.EVEN_REMOVED_PARALLEL, ::sieveEvenRemovedParallelKotlin),
+        SieveAlgorithm(AlgLang.KOTLIN, AlgType.BIT_ARRAY, ::sieveBitArrayKotlin),
+        SieveAlgorithm(AlgLang.CPP, AlgType.DEFAULT, ::sieveCpp),
+        SieveAlgorithm(AlgLang.CPP, AlgType.PARALLEL, ::sieveParallelCpp),
+        SieveAlgorithm(AlgLang.C, AlgType.DEFAULT, ::sieveC),
+        SieveAlgorithm(AlgLang.C, AlgType.PARALLEL, ::sieveParallelC),
+        SieveAlgorithm(AlgLang.C, AlgType.EVEN_REMOVED, ::sieveEvenRemovedC),
+        SieveAlgorithm(AlgLang.C, AlgType.EVEN_REMOVED_PARALLEL, ::sieveEvenRemovedParallelC),
+        SieveAlgorithm(AlgLang.C, AlgType.BIT_ARRAY, ::sieveBitArrayC),
     )
 
     private val resultsCSV = mutableListOf<ResultRow>()
@@ -92,9 +79,14 @@ class MainActivity : AppCompatActivity() {
             println(String.format(Locale.getDefault(), "%-30s | %10d ", algorithm.function.name, n))
             repeat(warmupIterations) {
                 try {
-                    algorithm.function.callSuspend(n)
+                    if (algorithm.language == AlgLang.KOTLIN) {
+                        if (n <= Int.MAX_VALUE) algorithm.function.callSuspend(n.toInt())
+                        else Log.e("Warmup", "N too large for Kotlin algorithm: $n")
+                    }
+                    else
+                        algorithm.function.callSuspend(n)
                 } catch (e: Exception) {
-                    Log.e("Warmup", "Error in warmup for n=$n: ${e.cause}")
+                    Log.e("Warmup", "Error in warmup for n=$n: $e")
                 }
             }
         }
@@ -104,39 +96,61 @@ class MainActivity : AppCompatActivity() {
         println("\n\nTesting ...")
         for (n in listN) {
             val execTimes = mutableListOf<Long>()
-            val primeCount1 = sieveParallelC(n)
+            val primeCount1: Long = sieveParallelC(n)
 
             for (algorithm in algorithms) {
+                System.gc()
+                Runtime.getRuntime().gc()
                 println("\n\nTest: ${algorithm.function.name} \tN: $n ")
                 println(String.format(Locale.getDefault(),"%-10s | %15s | %10s", "Time", "Prime Count", "Correct"))
 
                 // Run the algorithm multiple times and check if the prime count is correct
                 val correct = BooleanArray(iterations) { false }
-                var primesCountError = 0
+                var primesCountError: Number = 0
                 execTimes.clear()
 
-                repeat(iterations) {
-                    var primesCount: Int
-                    val time = measureTime {
-                        primesCount = algorithm.function.callSuspend(n)
-                    }.inWholeMilliseconds
-                    if (primesCount != primeCount1){
-                        primesCountError = primesCount
-                        Log.e("PRIME COUNT", "Incorrect prime count: $primesCount")
-                    }
-                    else
-                        correct[it] = true
+                try {
+                    repeat(iterations) {
+                        val nValue: Number =
+                            if (algorithm.language == AlgLang.KOTLIN) {
+                                if (n <= Int.MAX_VALUE) n.toInt()
+                                else Log.e("Test", "N too large for Kotlin algorithm: $n")
+                            }
+                            else n
+                        var primesCount: Number
+                        val time = measureTime {
+                            primesCount = algorithm.function.callSuspend(nValue)
+                        }.inWholeMilliseconds
+                        if (primesCount.toLong() != primeCount1) {
+                            primesCountError = primesCount
+                            Log.e("PRIME COUNT", "Incorrect prime count: $primesCount Correct: $primeCount1")
+                        } else
+                            correct[it] = true
 
-                    execTimes.add(time)
-                    println(String.format(Locale.getDefault(), "%-10d | %15d | %10s", time, primesCount, correct[it]))
+                        execTimes.add(time)
+                        println(String.format(Locale.getDefault(), "%-10d | %15d |  %10s", time, primesCount, correct[it]))
+                    }
+                } catch (
+                    e: Exception
+                ) {
+                    Log.e("Error", "Error in test for algorithm ${algorithm.function.name} and n=$n: $e")
                 }
 
                 // Calculate average execution time and add to results
                 val avgExecTime = execTimes.average().toLong()
                 val correctResult = correct.all { it }
-                val primesCountResult = if (correctResult) primeCount1 else primesCountError
+                val primesCountResult: Number = if (correctResult) primeCount1 else primesCountError
                 println("Average time: $avgExecTime")
-                resultsCSV.add(ResultRow(algorithm.language, algorithm.type, n, avgExecTime, primesCountResult, correctResult))
+                resultsCSV.add(
+                    ResultRow(
+                        algorithm.language.toString(),
+                        algorithm.type.toString(),
+                        n,
+                        avgExecTime,
+                        primesCountResult,
+                        correctResult
+                    )
+                )
             }
         }
     }
@@ -197,10 +211,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.buttonExec.setOnClickListener {
             val nInput = binding.nPrimes.text.toString()
-            val nInputInt = nInput.toIntOrNull()
+            val nInputLong = nInput.toLongOrNull()
 
-            if (nInputInt != 0 && nInputInt != null && !listN.contains(nInputInt)){
-                listN.add(nInputInt)
+            if (nInputLong != null && !listN.contains(nInputLong)){
+                listN.add(nInputLong)
             }
 
             if (listN.isNotEmpty()){
@@ -210,10 +224,13 @@ class MainActivity : AppCompatActivity() {
                 // run tests and write results to CSV / UI
                 lifecycleScope.launch {
                     withContext(Dispatchers.Default) {
-                        runWarmup()
-                        runTests()
-                        writeResultsToCSV()
-                        writeResultsToUI()
+                        val totalTestingTime = measureTime {
+                            runWarmup()
+                            runTests()
+                            writeResultsToCSV()
+                            writeResultsToUI()
+                        }
+                        println("\n\nTotal testing time: ${totalTestingTime.inWholeMinutes}")
                     }
                 }
             }
