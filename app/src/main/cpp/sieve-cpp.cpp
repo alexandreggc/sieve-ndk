@@ -104,10 +104,10 @@ Java_com_example_mytestapp_SieveCppKt_sieveParallelCpp(
     std::mutex mtx;
 
 #pragma omp parallel for schedule(dynamic)
-    for (int i = 2; i <= limit; ++i) {
+    for (unsigned long long i = 2; i <= limit; ++i) {
         if (isPrime[i]) {
             mtx.lock();
-            for (int j = i * i; j <= n; j += i) {
+            for (unsigned long long j = i * i; j <= n; j += i) {
                 isPrime[j] = false;
             }
             mtx.unlock();
