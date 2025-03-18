@@ -309,6 +309,7 @@ Java_com_example_mytestapp_SieveCKt_sieveBitArrayC(JNIEnv *env, jclass clazz, jl
             primeCount++;
         }
     }
+    delete_bitter(b);
 
     return primeCount;
 }
