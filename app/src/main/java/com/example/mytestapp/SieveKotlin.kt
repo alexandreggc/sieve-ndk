@@ -3,7 +3,10 @@ package com.example.mytestapp
 import com.example.mytestapp.bitset.NonBlockingConcurrentBitSet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import java.util.BitSet
 import kotlin.math.sqrt
 
 suspend fun sieveKotlin(n: Int): Int = withContext(Dispatchers.Default) {
@@ -60,25 +63,37 @@ suspend fun sieveParallelKotlin(n: Int): Int = withContext(Dispatchers.Default) 
     if (n >= 1) isPrime[1] = false
 
     val limit = sqrt(n.toDouble()).toInt()
-    val numThreads = Runtime.getRuntime().availableProcessors()
-    val chunkSize = (limit - 2 + 1) / numThreads
+//    val numThreads = Runtime.getRuntime().availableProcessors()
+//    val chunkSize = (limit - 2 + 1) / numThreads
 
-    val jobs = (0 until numThreads).map { threadIndex ->
-        val start = 2 + threadIndex * chunkSize
-        val end = if (threadIndex == numThreads - 1) limit else start + chunkSize - 1
+//    val jobs = (0 until numThreads).map { threadIndex ->
+//        val start = 2 + threadIndex * chunkSize
+//        val end = if (threadIndex == numThreads - 1) limit else start + chunkSize - 1
+//
+//        launch(Dispatchers.Default) {
+//            for (i in start..end) {
+//                if (isPrime[i]) {
+//                    for (j in i * i..n step i) {
+//                        isPrime[j] = false
+//                    }
+//                }
+//            }
+//        }
+//    }
 
+
+    val jobs = (2..limit).map { i ->
         launch(Dispatchers.Default) {
-            for (i in start..end) {
-                if (isPrime[i]) {
-                    for (j in i * i..n step i) {
-                        isPrime[j] = false
-                    }
+            if (isPrime[i]) {
+                for (j in i * i..n step i) {
+                    isPrime[j] = false
                 }
             }
         }
     }
 
     jobs.forEach { it.join() }
+
 
     val primesCount = isPrime.count { it }
 
@@ -137,8 +152,8 @@ suspend fun sieveEvenRemovedParallelKotlin(n: Int): Int = withContext(Dispatcher
 suspend fun sieveBitArrayKotlin(n: Int): Int = withContext(Dispatchers.Default) {
     val nEven = n / 2
 
-//    val isPrime = BitSet(nEven + 1)
-    val isPrime = NonBlockingConcurrentBitSet(nEven + 1)
+    val isPrime = BitSet(nEven + 1)
+//    val isPrime = NonBlockingConcurrentBitSet(nEven + 1)
 
     for (i in 0..nEven) {
         isPrime.set(i)
@@ -150,7 +165,7 @@ suspend fun sieveBitArrayKotlin(n: Int): Int = withContext(Dispatchers.Default) 
     val numThreads = Runtime.getRuntime().availableProcessors().coerceAtLeast(1)
     val rangeSize = ((limit - 1) / 2 + 1) / numThreads
 
-//    val mutex = Mutex()
+    val mutex = Mutex()
     val jobs = (0 until numThreads).map { threadIndex ->
         val start = 1 + 2 * threadIndex * rangeSize
         val end = if (threadIndex == numThreads - 1) limit else start + 2 * rangeSize - 1
@@ -160,10 +175,10 @@ suspend fun sieveBitArrayKotlin(n: Int): Int = withContext(Dispatchers.Default) 
                 if (isPrime[value / 2]) {
                     for (mulValue in value * value..n step value) {
                         if (mulValue % 2 != 0) {
-//                            mutex.withLock {
-//                                isPrime.clear(mulValue / 2)
-//                            }
-                             isPrime.clear(mulValue / 2)
+                            mutex.withLock {
+                                isPrime.clear(mulValue / 2)
+                            }
+//                             isPrime.clear(mulValue / 2)
                         }
                     }
                 }
@@ -173,12 +188,12 @@ suspend fun sieveBitArrayKotlin(n: Int): Int = withContext(Dispatchers.Default) 
     jobs.forEach { it.join() }
 
 
-    var count = 0
-    for (i in 0..nEven) {
-        if (isPrime.get(i)) {
-            count++
-        }
-    }
-    return@withContext count
-//    return@withContext isPrime.cardinality()
+//    var count = 0
+//    for (i in 0..nEven) {
+//        if (isPrime.get(i)) {
+//            count++
+//        }
+//    }
+//    return@withContext count
+    return@withContext isPrime.cardinality()
 }
