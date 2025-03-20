@@ -114,6 +114,13 @@ Java_com_example_mytestapp_SieveCppKt_sieveParallelCpp(
         }
     }
 
+    unsigned long long primeCount = 0;
+#pragma omp parallel for reduction(+:primeCount) // maybe this parallelization here is slowing down the exec time
+    for (unsigned long long i = 0; i <= n; ++i) {
+        if (isPrime[i]) {
+            primeCount++;
+        }
+    }
     return static_cast<long long>(std::count(isPrime.begin(), isPrime.end(), true));
 }
 
@@ -160,4 +167,40 @@ Java_com_example_mytestapp_SieveCppKt_sieveResultsParallelCpp(
     }
 
     return arrayListObj;
+}
+
+extern "C"
+JNIEXPORT jlong JNICALL
+Java_com_example_mytestapp_SieveCppKt_sieveEvenRemovedParallelCpp(JNIEnv *env, jclass clazz, jlong n) {
+
+    unsigned long long nEven = n / 2;
+    std::vector<bool> isPrime(nEven + 1, true);
+
+    if (n >= 0) isPrime[0] = false;
+
+    unsigned long long limit = std::sqrt((double)n);
+    std::mutex mtx;
+
+#pragma omp parallel for schedule(dynamic)
+    for (unsigned long long value = 1; value <= limit; value+=2) {
+        if (isPrime[value / 2]) {
+            mtx.lock();
+            for (unsigned long long mulValue = value * value; mulValue <= n; mulValue += value) {
+                if (mulValue % 2)
+                    isPrime[mulValue / 2] = false;
+            }
+            mtx.unlock();
+        }
+    }
+
+    long long primeCount = 0;
+
+#pragma omp parallel for reduction(+:primeCount)
+    for (unsigned long long i = 1; i < nEven+1; i++) {
+        if (isPrime[i]) {
+            primeCount++;
+        }
+    }
+
+    return primeCount;
 }
